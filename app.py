@@ -13,7 +13,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 # ----------------- CONFIGURACIÓN -----------------
 st.set_page_config(page_title="Ciencia Ciudadana Marina", layout="centered")
-PASSWORD   = "océano2025"                    # Cambia si lo deseas
+PASSWORD   = "oceano2025"                    # Cambia si lo deseas
 IMAGES_DIR = "fotos"                         # Carpeta local para fotos
 COLS       = ["Especie", "Fecha", "Hora", "Latitud", "Longitud", "Comentario", "Foto"]
 
@@ -21,9 +21,9 @@ COLS       = ["Especie", "Fecha", "Hora", "Latitud", "Longitud", "Comentario", "
 SHEET_ID = "1Jr0JHfkOtX_48Df6F9WxKyRKAQpMqKoFx5Fr7ydMR-g"
 
 # ----------------- AUTENTICACIÓN BÁSICA -----------------
-st.title("🔒 Avistamientos Marinos – Acceso")
-if st.text_input("Contraseña:", type="password") != PASSWORD:
-    st.stop()
+st.title("🔒 Avistamientos Marinos")
+#if st.text_input("Contraseña:", type="password") != PASSWORD:
+#    st.stop()
 
 # ----------------- CONEXIÓN A GOOGLE SHEETS -----------------
 @st.cache_resource(show_spinner=False, ttl=3600)
@@ -31,6 +31,7 @@ def conectar_google_sheets(json_keyfile:str, sheet_id:str):
     """Devuelve el objeto worksheet (hoja 1) y garantiza encabezados."""
     scope = ["https://spreadsheets.google.com/feeds",
              "https://www.googleapis.com/auth/drive"]
+    creds_dict = st.secrets["google"]
     creds  = ServiceAccountCredentials.from_json_keyfile_name(json_keyfile, scope)
     client = gspread.authorize(creds)
     sheet  = client.open_by_key(sheet_id).sheet1
@@ -47,7 +48,7 @@ try:
 except Exception as e:
     st.error(f"❌ No se pudo conectar con Google Sheets: {e}")
     st.stop()
-
+st.success("Conexión con Google Sheets exitosa ✅")
 # ----------------- UTILIDADES -----------------
 def sheet_to_df(ws):
     """Convierte la hoja a DataFrame con las columnas correctas."""
