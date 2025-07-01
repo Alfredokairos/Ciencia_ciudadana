@@ -27,25 +27,29 @@ st.title("🔒 Avistamientos Marinos")
 
 # ----------------- CONEXIÓN A GOOGLE SHEETS -----------------
 @st.cache_resource(show_spinner=False, ttl=3600)
-def conectar_google_sheets(json_keyfile:str, sheet_id:str):
+def conectar_google_sheets(sheet_id:str):
     """Devuelve el objeto worksheet (hoja 1) y garantiza encabezados."""
     scope = ["https://spreadsheets.google.com/feeds",
              "https://www.googleapis.com/auth/drive"]
+
+    # ✅ Aquí usamos los secrets en vez de un archivo físico
     creds_dict = st.secrets["google"]
-    creds  = ServiceAccountCredentials.from_json_keyfile_name(dict(creds_dict), scope)
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(dict(creds_dict), scope)
+    
     client = gspread.authorize(creds)
-    sheet  = client.open_by_key(sheet_id).sheet1
+    sheet = client.open_by_key(sheet_id).sheet1
 
     # Garantiza que la primera fila contenga los encabezados correctos
     encabezados = sheet.row_values(1)
     if encabezados != COLS:
         if encabezados:
             sheet.delete_row(1)
-            sheet.insert_row(COLS, 1)
-        return sheet
+        sheet.insert_row(COLS, 1)
+
+    return sheet
 
 try:
-    sheet = conectar_google_sheets("credenciales.json", SHEET_ID)
+    sheet = conectar_google_sheets(SHEET_ID)
 except Exception as e:
     st.error(f"❌ No se pudo conectar con Google Sheets: {e}")
     st.stop()
