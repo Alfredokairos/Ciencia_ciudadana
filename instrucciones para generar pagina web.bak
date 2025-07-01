@@ -1,0 +1,8 @@
+Instrucciones para abrir una pagina en streamlit.
+
+Primero se necesita guardar el codigo en notepad como .py
+despues abrir anaconda prompt, cambiar de C a D con el siguiente comando D:
+despues dirigirse a la ruta dond ese encuentra el archivo guardado
+
+streamlit run app.py
+ese comando te direcciona a la pagina creada en streamlit.
