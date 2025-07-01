@@ -32,16 +32,17 @@ def conectar_google_sheets(json_keyfile:str, sheet_id:str):
     scope = ["https://spreadsheets.google.com/feeds",
              "https://www.googleapis.com/auth/drive"]
     creds_dict = st.secrets["google"]
-    creds  = ServiceAccountCredentials.from_json_keyfile_name(json_keyfile, scope)
+    creds  = ServiceAccountCredentials.from_json_keyfile_name(dict(creds_dict), scope)
     client = gspread.authorize(creds)
     sheet  = client.open_by_key(sheet_id).sheet1
 
     # Garantiza que la primera fila contenga los encabezados correctos
     encabezados = sheet.row_values(1)
     if encabezados != COLS:
-        sheet.delete_row(1) if encabezados else None
-        sheet.insert_row(COLS, 1)
-    return sheet
+        if encabezados:
+            sheet.delete_row(1)
+            sheet.insert_row(COLS, 1)
+        return sheet
 
 try:
     sheet = conectar_google_sheets("credenciales.json", SHEET_ID)
